@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # great for docker image that needs node installed!
+NODE_VERSION=21.x
 
 cyan='\033[0;36m'
 green='\033[0;32m'
@@ -41,28 +42,28 @@ log() {
 update() {
     log "Updating local environment..." "info"
     if ! apt-get update -y ; then
-        log "Failed to update local repository." "error"
+        log "Failed to update local repository" "error"
         exit 1
     fi
 
     if ! apt-get upgrade -y; then
-        log "Failed to upgrade local repository." "error"
+        log "Failed to upgrade local repository" "error"
         exit 1
     fi
 
-    if ! apt install -y curl; then
-        log "Failed to install curl." "error"
+    if ! apt-get install -y curl; then
+        log "Failed to install curl" "error"
         exit 1
     fi
-    log "Local environment updated successfully." "success"
+    log "Local environment updated successfully" "success"
 }
 
 getNode() {
-    log "Getting installation script for NodeJS 21.x..." "info"
-    curl -sLk -o /app/nodesource_setup.sh https://deb.nodesource.com/setup_21.x
+    log "Getting installation script for NodeJS ${NODE_VERSION}..." "info"
+    curl -sLk -o /app/nodesource_setup.sh https://deb.nodesource.com/setup_$NODE_VERSION
     
     if ! sh /app/nodesource_setup.sh; then
-        log "Failed to get installation script for NodeJS 21.x." "error"
+        log "Failed to get installation script for NodeJS ${NODE_VERSION}" "error"
         exit 1
     fi
 
@@ -79,10 +80,10 @@ getNode() {
 
 checkNodeVersion() {
     version=$(node -v)
-    if [[ "${version:0:3}" = "v21" ]]; then
+    if [[ "${version:1:2}" = ${NODE_VERSION:0:2} ]]; then
         log "NodeJS version is ${version:0:3}" "info"
     else
-        log "NodeJS version ${version:0:3} is not 21.x." "error"
+        log "NodeJS version ${version:0:3} is not ${NODE_VERSION}" "error"
         exit 1
     fi
 }
